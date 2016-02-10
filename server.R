@@ -15,9 +15,9 @@ shinyServer(
     # Update seed automatically based on selections.
     # Putting the update to as.integer first makes sure it can only
     # be changed to an integer.
-    observe ({
-      updateNumericInput(session, "seed", value=as.integer(input$seed))
-    })
+    #observe ({
+    #  updateNumericInput(session, "seed", value=as.integer(input$seed))
+    #  }    )
     observe ({
       c_which <- input$which
       c_type <- input$type
