@@ -24,6 +24,7 @@ shinyUI(pageWithSidebar(
     downloadButton('downloadData','Download'),
 
     showOutput('outplot','nvd3'),
+    #plotOutput('outplot'),
     
     DT::dataTableOutput('checktable')
   )
