@@ -16,11 +16,14 @@ shinyServer(
     indata <- refInput
 
     # See README.md for this debounce function, from Joe Cheng at RStudio
-    dbtime <- 100
+    dbtime <- 150
     debounceseed <- debounce(input$seed, dbtime)
     debouncepropupper <- debounce(input$propupper, dbtime)
     debounceproplower <- debounce(input$proplower, dbtime)
     debouncepropinlier <- debounce(input$propinlier, dbtime)
+
+    # To hold either dynamic or static plots.
+    reactplot <- reactiveValues()
 
     # Funny stuff about suspend / resume to ensure the first observe (desired
     # default) gets the final say when page first loads. Similarly reactseed
@@ -59,7 +62,9 @@ shinyServer(
     output$checktable <- DT::renderDataTable(
       DT::datatable(checklist(), options=list(pageLength=10)))
     
-    plotChecks <- reactive({
+    # Update plots. An observer is used because we either want
+    # to update the rChart or the ggplot, but no point doing both.
+    observe ({
       plotdata <- datatocheck()
       checkdata <- checklist()
       plotdata$check <- ifelse (plotdata$label %in% checkdata$label,
@@ -84,11 +89,17 @@ shinyServer(
           return e.point.label
                 } !#")
       n1$xAxis(axisLabel=xlabel) ; n1$yAxis(axisLabel=ylabel)
-      n1
-      #g1 <- ggplot(plotdata,mapping=eqa,data=plotdata)+geom_point() ; g1
+      if (input$plottype == "Dynamic") {
+        reactplot$n1 <- n1
+      } else {
+        g1 <- ggplot(plotdata,mapping=eqa,data=plotdata)+geom_point()
+        reactplot$g1 <- g1
+      }
     })
-    output$outplot <- renderChart2({plotChecks()})
-    
+
+    output$outplotDy <- renderChart2(reactplot$n1)
+    output$outplotSt <- renderPlot(reactplot$g1)
+
     output$downloadData <- downloadHandler(
       filename = function() {
         descrip <- paste("rangecheck",input$date,input$which,input$type,
