@@ -1,0 +1,17 @@
+.rotate-45-left:before {
+    display: block;
+    -o-transform: rotate(-45deg);
+    -webkit-transform: rotate(-45deg);
+    transform: rotate(-45deg);
+}
+
+.rotate-45-right:before {
+    display: block;
+    -o-transform: rotate(45deg);
+    -webkit-transform: rotate(45deg);
+    transform: rotate(45deg);
+}
+
+.hidden {
+    visibility: hidden;
+}

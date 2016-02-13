@@ -1,7 +1,12 @@
 library(shiny)
+library(shinyBS)
 require(rCharts)
 
-shinyUI(pageWithSidebar(
+shinyUI(fluidPage(
+  tags$head(
+    tags$link(rel = "stylesheet", type = "text/css", href = "rotate45.css")
+  ),
+  
   headerPanel("Range checker demo"),
   sidebarPanel(
     h3('Settings'),
@@ -17,20 +22,23 @@ shinyUI(pageWithSidebar(
     numericInput("propinlier", label="Inlier proportion",
                  value=0.01, step=0.005, min=0, max=0.5),
     numericInput("seed", label="Seed for checks", value=0,
-                 step=1, min = - .Machine$integer.max, max= .Machine$integer.max),
-    radioButtons('plottype',"Plot type", inline=TRUE,
-                 c("Dynamic","Static"), selected="Dynamic")
+                 step=1, min = - .Machine$integer.max, max= .Machine$integer.max)
   ),
   mainPanel(
-    h3('Check data', textOutput('odate')),
+    fluidRow(column(width=4, 'Check data', textOutput('odate')),
+              column(width=3, downloadButton('downloadData','Download')),
+             column(width=3,actionButton('helptoggle','Help',icon=icon('question')))
+    ),
 
-    downloadButton('downloadData','Download'),
+    bsModal("helpmodal", "Help", "helptoggle", size = "large",
+            "Some help here please!"),
 
-    conditionalPanel(condition="input.plottype == 'Dynamic'",
-                     showOutput('outplotDy','nvd3')),
-    conditionalPanel(condition="input.plottype == 'Static'",
-                     plotOutput('outplotSt')),
+    tabsetPanel(id='plottype',
+                tabPanel('Dynamic', showOutput('outplotDy','nvd3')),
+                tabPanel('Static', plotOutput('outplotSt'))
+    ),
     
+
     DT::dataTableOutput('checktable')
   )
 ))
