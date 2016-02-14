@@ -13,7 +13,6 @@ refInput <- readInput('data/test1.csv')
 
 shinyServer(
   function(input,output, clientData, session) {
-    indata <- refInput
 
     # See README.md for this debounce function, from Joe Cheng at RStudio
     dbtime <- 150
@@ -22,8 +21,13 @@ shinyServer(
     debounceproplower <- debounce(input$proplower, dbtime)
     debouncepropinlier <- debounce(input$propinlier, dbtime)
 
+    # Handle checking dataset / uploaded files
+    reactdata <- reactiveValues(data=refInput, report = "default data")
+
     # To hold either dynamic or static plots.
     reactplot <- reactiveValues()
+
+    ### Seed related
 
     # Funny stuff about suspend / resume to ensure the first observe (desired
     # default) gets the final say when page first loads. Similarly reactseed
@@ -48,8 +52,49 @@ shinyServer(
 
     output$odate <- renderText({paste(as.character(input$date), reactseed$seed)})
 
+
+    ### New data loading
+
+    observe({
+      newfile <- input$uploadData
+      size <- newfile$size
+      name <- cleanstring(newfile$name)
+      dpath <- newfile$datapath
+
+      if (length(size) == 0) {
+        # Do nothing, no file uploaded.
+      }
+      else if ( size > 500*2^10) {
+        createAlert(session, 'filereport', style = 'danger', append = FALSE,
+          content = "Not loaded: Filesize exceeded limit")
+      }
+      else {
+        newdata <- readInput(dpath)
+        if (class(newdata) != "data.frame") {
+          createAlert(session, 'filereport', style = 'danger', append = FALSE,
+            content = paste("Not loaded:",cleanstring(newdata)))
+        }
+        else if (nrow(newdata) == 0) {
+          # Actually, we don't hit this, since the column type test fails first.
+          createAlert(session, 'filereport', style = 'danger', append = FALSE,
+            content = "Not loaded: No rows in file, what are you trying to pull?")
+        }
+        else {
+          createAlert(session, 'filereport', append = FALSE,
+                      content = paste("File:", name))
+          reactdata$data <- newdata
+          reactdata$report <- name
+        }
+      }
+    })
+
+    output$ofile <- renderText({reactdata$report})
+
+
+    ### Core operation, data points to check
+
     datatocheck <- reactive({
-      buildInput(indata,input$which)
+      buildInput(reactdata$data,input$which)
     })
 
     checklist <- reactive({
@@ -59,10 +104,28 @@ shinyServer(
                lower.tail=debounceproplower(),
                inliers=debouncepropinlier())
     })
+
+
+
+    ### Table and downloadable outputs
+
     output$checktable <- DT::renderDataTable(
       DT::datatable(checklist(), options=list(pageLength=10)))
-    
-    # Update plots. An observer is used because we either want
+
+    output$downloadData <- downloadHandler(
+      filename = function() {
+        descrip <- paste("rangecheck",input$date,input$which,input$type,
+                         reactseed$seed, sep="_")
+        paste0(descrip,".csv")
+      },
+      content = function(file) {
+        write.csv(checklist(), file)
+      }
+    )
+
+    ### Update plots.
+
+    # An observer is used because we either want
     # to update the rChart or the ggplot, but no point doing both.
     observe ({
       plotdata <- datatocheck()
@@ -102,16 +165,5 @@ shinyServer(
     output$outplotDy <- renderChart2(reactplot$n1)
     output$outplotSt <- renderPlot(reactplot$g1)
 
-    output$downloadData <- downloadHandler(
-      filename = function() {
-        descrip <- paste("rangecheck",input$date,input$which,input$type,
-                         reactseed$seed, sep="_")
-        paste0(descrip,".csv")
-      },
-      content = function(file) {
-        write.csv(checklist(), file)
-      }
-    )
-    
   }
 )

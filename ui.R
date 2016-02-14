@@ -58,10 +58,16 @@ shinyUI(fluidPage(
                  step=1, min = - .Machine$integer.max, max= .Machine$integer.max)
   ),
   mainPanel(
-    fluidRow(column(width=4, 'Check date and seed', textOutput('odate')),
-              column(width=3, downloadButton('downloadData','Download')),
-             column(width=3,bsButton('helptoggle','Help',icon=icon('question'),
+    fluidRow(column(width=4, 'Check date and seed',
+                    textOutput('odate'), textOutput('ofile'), bsAlert('filereport')),
+             column(width=6,
+                    fluidRow(
+             column(width=6, downloadButton('downloadData','Download')),
+             column(width=6,bsButton('helptoggle','Help',icon=icon('question'),
                                      style='info',type='toggle'))
+                    ),
+             fileInput('uploadData','Upload',
+                       accept="text/csv"))
     ),
 
     tabsetPanel(id='plottype',

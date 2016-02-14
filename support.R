@@ -16,30 +16,44 @@ jointseed <- function(datein,string) {
 }
 
 
+# Read a supplied file, check it has all our required fields and types.
+# Return a data frame if okay, otherwise return errors as strings, 
 readInput <- function(filename) {
   fields <- c("label","brainA","brainB","brainchange","ventA","ventB","ventchange");
   loaderr <- FALSE
   errmsg <- ""
-  indata <- read.csv(filename, stringsAsFactors = FALSE, header = TRUE)
+  tryCatch(
+    indata <- read.csv(filename, stringsAsFactors = FALSE, header = TRUE),
+    error = function(x) { loaderr <<- TRUE ; errmsg <<- "Failed loading file"}
+  )
 
-  if (sum(fields %in% colnames(indata)) != length(fields)) {
+  if (!loaderr &&
+      sum(fields %in% colnames(indata)) != length(fields)) {
     errmsg <-"Input file missing required fields"
     loaderr <- TRUE
   }
-  if (!loaderr &
+  if (!loaderr &&
       any(sapply(fields, function(x){x!="label" & !is.numeric(indata[,x])}))){
     errmsg <- "Some result columns in input file are not numeric"
+    loaderr <- TRUE
+  }
+
+  if (! loaderr &&
+      length(unique(indata[,"label"])) != nrow(indata)) {
+    errmsg <- "Row labels are not unique."
+    loaderr <- TRUE
   }
   if (loaderr) {
     errmsg
   } else {
-    indata
+    indata[,fields]
   }
 }
 
+# Get desired values (which=brain/vent) from the full input data
+# calculate difference in measured volumes (different from measured change)
+# Return a data frame or errors as strings.
 buildInput <- function(indata, which) {
-  # Get desired values (which=brain/vent) from the full input data
-  # calculate difference in measured volumes (different from measured change)
   types <- c("A","B","change")
   errs <- FALSE
   if ( ! which %in% c("vent","brain")) {
@@ -53,11 +67,16 @@ buildInput <- function(indata, which) {
   outdata
 }
 
-outliers <- function(builtdata, type, lower.tail=0, upper.tail=0, inliers=0) {
-  # type = vol/change
-  # Tails and inliers specified as proportion of the data to list as outliers.
-  # Return list of labels and types (for type=vol returned types are volA/volB)
-  # and value to be checked.
+
+# type = vol/change
+# Tails and inliers specified as proportion of the data to list as outliers.
+# NA values are included in the checking set, unless dropNA=TRUE, but number of
+# rows to return for each tail and inliers is still calculated as a proportion
+# of full data (that is, NA are reported as extra checks).
+# Return list of labels and types (for type=vol returned types are volA/volB)
+# and value to be checked.
+outliers <- function(builtdata, type, lower.tail=0, upper.tail=0, inliers=0,
+                     dropNA=FALSE) {
   # Can't exclude more than all the data.
   lower.tail <- min(max(lower.tail,0),1)
   upper.tail <- min(max(upper.tail,0),1-lower.tail)
@@ -72,8 +91,10 @@ outliers <- function(builtdata, type, lower.tail=0, upper.tail=0, inliers=0) {
     type
   }
   checkvals <- melt(builtdata, id.vars="label", measure.vars=getvals)
+  checkvals$checkna <- (! dropNA) * is.na(checkvals$value)
   # Find the outliers in tails
-  rangelim <- quantile(checkvals$value,probs=c(lower.tail, 1-upper.tail))
+  rangelim <- quantile(checkvals$value,probs=c(lower.tail, 1-upper.tail),
+                       na.rm=TRUE)
   checkvals$outlier <- findInterval(checkvals$value,rangelim,
                                     rightmost.closed = TRUE) != 1
   # Find the random inliers to check
@@ -82,8 +103,13 @@ outliers <- function(builtdata, type, lower.tail=0, upper.tail=0, inliers=0) {
   checkind <- sample(inlierInd, inliersN)
   checkvals$incheck <- FALSE
   checkvals$incheck[checkind] <- 1
-  checkvals$allcheck <- checkvals$incheck | checkvals$outlier
+  checkvals$allcheck <- checkvals$incheck | checkvals$outlier | checkvals$checkna
   checkvals[checkvals$allcheck,c("label","variable","value")]
+}
+
+# Aggressively sanitise input strings
+cleanstring <- function(x) {
+  gsub("[^A-Za-z0-9 _\\.-]","",x)
 }
 
 
