@@ -11,7 +11,7 @@ bsModalHelp <-  bsModal(
           "results to pick points for checking from. Either brain or lateral ventricles",
           "(vent) results sets, and either the individual volume measures (vol) or",
           "direct change measures. Points for checking are shown in the right hand",
-          "panel, or can be downloaded (see below).")),
+          "panel as plots or tables, or can be downloaded as a list (see below).")),
   h4("Data point selection"),
   p(paste("The default is to choose the lowest 0.02 (2%) and highest 0.02 (2%) of",
           "the results, as well as 0.01 (1%) randomly selected from the other",
@@ -58,21 +58,21 @@ shinyUI(fluidPage(
                  step=1, min = - .Machine$integer.max, max= .Machine$integer.max)
   ),
   mainPanel(
-    fluidRow(column(width=4, 'Check data', textOutput('odate')),
+    fluidRow(column(width=4, 'Check date and seed', textOutput('odate')),
               column(width=3, downloadButton('downloadData','Download')),
              column(width=3,bsButton('helptoggle','Help',icon=icon('question'),
                                      style='info',type='toggle'))
     ),
 
-    bsModalHelp,
-
     tabsetPanel(id='plottype',
                 tabPanel("Static plot",value='Static',
                          plotOutput('outplotSt')),
                 tabPanel("Dynamic plot",value='Dynamic',
+                         p("Click on the dynamic plot to show data point labels"),
                          showOutput('outplotDy','nvd3')),
                 tabPanel('Table', DT::dataTableOutput('checktable'))
-    )
-
+    ),
+    
+    bsModalHelp
   )
 ))
