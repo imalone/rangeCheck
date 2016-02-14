@@ -91,9 +91,11 @@ shinyServer(
       n1$xAxis(axisLabel=xlabel) ; n1$yAxis(axisLabel=ylabel)
       if (input$plottype == "Dynamic") {
         reactplot$n1 <- n1
-      } else {
+      } else if (input$plottype == "Static") {
         g1 <- ggplot(plotdata,mapping=eqa,data=plotdata)+geom_point()
         reactplot$g1 <- g1
+      } else {
+        NA
       }
     })
 
