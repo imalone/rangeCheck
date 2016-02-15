@@ -10,6 +10,7 @@
 
 <meta name="author" content="Ian" />
 
+<meta name="date" content="2016-02-15" />
 
 <title>Range checking tool</title>
 
@@ -63,17 +64,23 @@ img {
 <div id="header">
 <h1 class="title">Range checking tool</h1>
 <h4 class="author"><em>Ian</em></h4>
-<h4 class="date"><em>9 February 2016</em></h4>
+<h4 class="date"><em>15 February 2016</em></h4>
 </div>
 
 
 <div id="range-checking-tool-demo" class="section level1">
 <h1>Range checking tool demo</h1>
-<p>This is a demonstrator Shiny (R) application for performing range checking on volumetric MRI measures. It is composed of four files:</p>
-<p>server.R : Shiny server application.</p>
-<p>ui.R : Shiny UI template.</p>
-<p>support.R : Core functions for the server application.</p>
-<p>simulate.R : Used to build the test data-sets. Run separately from the Shiny application.</p>
+<p>This is a demonstrator Shiny (R) application for performing range checking on volumetric MRI measures. For instructions see the in-application help or bsModalHelp function in rangeCheck/ui.R. In brief, uploaded datasets from volumetric brain measurements (or a default) are processed to select observation tails and a random selection of inliers for manual checking to assure data quality. For more information on why this is useful, see the presentation <a href="http://imalone.github.io/rangeCheck/" class="uri">http://imalone.github.io/rangeCheck/</a>.</p>
+<p><strong>N.B. ui.R and server.R located in the rangeCheck/ directory. deployApp() sends all files in directory and the presentation files shouldn’t be included.</strong></p>
+<p>index.Rmd, index.md, index.html : slidify presentation, shared to gh-pages branch</p>
+<p>assets/ : Files for slidify presentation (used when building)</p>
+<p>rangeCheck/ : Contains files for the rangeCheck application</p>
+<p>rangeCheck/server.R : Shiny server application.</p>
+<p>rangeCheck/ui.R : Shiny UI template.</p>
+<p>rangeCheck/support.R : Core functions for the server application.</p>
+<p>rangeCheck/debounce.R : from <a href="https://gist.github.com/jcheng5/6141ea7066e62cafb31c" class="uri">https://gist.github.com/jcheng5/6141ea7066e62cafb31c</a></p>
+<p>rangeCheck/simulate.R : Used to build the test data-sets. Run separately from the Shiny application.</p>
+<p>rangeCheck/data : Contains testing data for upload (both valid and invalid)</p>
 </div>
 
 
