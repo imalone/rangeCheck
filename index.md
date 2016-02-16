@@ -58,11 +58,13 @@ img { max-height: 560px;
 
 ## [Range Checker](https://imalone.shinyapps.io/rangeCheck/)
 
+<p style='opacity: 0.5'>(We're not done yet, press space.)</p>
+
 > * Allow easy upload of data to be checked and download of points selected.
 > * Parameters for selection can be changed on the fly.
 > * Per-day and -test seed generation makes it possible to confirm a given selection.
 > * RCharts and table display make it simple to investigate wildly incorrect points or spot data-loading problems.
 > * GitHub: <a href="https://github.com/imalone/rangeCheck" target="_blank"><i class="fa fa-github fa-2x"></i>https://github.com/imalone/rangeCheck</a>
-> * ShinyApp: https://imalone.shinyapps.io/rangeCheck/
+> * ShinyApp: https://imalone.shinyapps.io/rangeCheck/ <span style="opacity: 0.5">(Now we're done.)</span>
 
 Thanks to [RStudio](https://www.rstudio.com/) and [ShinyApps](https://www.shinyapps.io/), the [Data Science Specialisation lecturers](https://github.com/DataScienceSpecialization/courses/), many Coursera students and TAs, [Slidify](http://slidify.org/) and of course, the people behind [<i class="fa fa-fort-awesome"></i>Font Awesome](https://fortawesome.github.io/Font-Awesome/)

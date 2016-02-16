@@ -40,10 +40,10 @@ blinded dataset.
 * Values to check are selected as the top and bottom 2% and 1% randomly selected from the other points.
 * Sorting these out has previously been done by loading the results into a spreadsheet and manually sorting and applying formulas. We want to do this reproducibly and faster.
 
-```{r, echo=FALSE, fig.width=12, fig.height=5, class="center"}
+```{r, echo=FALSE, fig.width=12, fig.height=5, class="center", message='hide'}
 # A cut down version of the full operation. Could use support.R to do some
 # of this, but want the different categories, so construct it here instead.
-require(dplyr)
+require(dplyr, warn.conflicts = FALSE)
 require(ggplot2)
 ptail <- 0.02
 pin <- 0.01
@@ -56,7 +56,7 @@ grouped <- data.frame(vol= allvols,
                                             rightmost.closed = TRUE))
 grouped <- grouped %>%
   mutate(cat = factor(interval, levels=0:2,
-                      labels=c("Lower tail,","in-set","Upper tail")))
+                      labels=c("Lower tail","in-set","Upper tail")))
 middleInd <- which(grouped$interval == 1)
 set.seed(1)
 nInlier <- min(length(middleInd), pin*nvols)
@@ -91,11 +91,13 @@ img { max-height: 560px;
 
 ## [Range Checker](https://imalone.shinyapps.io/rangeCheck/)
 
+<p style='opacity: 0.5'>(We're not done yet, press space.)</p>
+
 > * Allow easy upload of data to be checked and download of points selected.
 > * Parameters for selection can be changed on the fly.
 > * Per-day and -test seed generation makes it possible to confirm a given selection.
 > * RCharts and table display make it simple to investigate wildly incorrect points or spot data-loading problems.
 > * GitHub: <a href="https://github.com/imalone/rangeCheck" target="_blank"><i class="fa fa-github fa-2x"></i>https://github.com/imalone/rangeCheck</a>
-> * ShinyApp: https://imalone.shinyapps.io/rangeCheck/
+> * ShinyApp: https://imalone.shinyapps.io/rangeCheck/ <span style="opacity: 0.5">(Now we're done.)</span>
 
 Thanks to [RStudio](https://www.rstudio.com/) and [ShinyApps](https://www.shinyapps.io/), the [Data Science Specialisation lecturers](https://github.com/DataScienceSpecialization/courses/), many Coursera students and TAs, [Slidify](http://slidify.org/) and of course, the people behind [<i class="fa fa-fort-awesome"></i>Font Awesome](https://fortawesome.github.io/Font-Awesome/)
