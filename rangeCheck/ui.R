@@ -6,7 +6,7 @@ bsModalHelp <-  bsModal(
   "helpmodal", "Help", "helptoggle", size = "large",
   h3("Range Checker Help"),
   p(paste("This app selects data points for manual checking from a set of brain",
-          "and ventricle results.")),
+          "and ventricle volume results.")),
   p(paste("Use the 'Results to check' and 'Measure Type' to select the set of",
           "results to pick points for checking from. Either brain or lateral ventricles",
           "(vent) results sets, and either the individual volume measures (vol) or",
@@ -31,7 +31,7 @@ bsModalHelp <-  bsModal(
                pre("label, brainA, brainB, brainchange, ventA, ventB, ventchange"),
          paste("Labels can be text, but must be unique, all other field must be",
                "numeric. Sample data can be downloaded from ")),
-    a(href="https://github.com/imalone/rangeCheck/tree/master/data",
+    a(href="https://github.com/imalone/rangeCheck/tree/master/rangeCheck/data",
       "the github repo"),".")
 )
 
